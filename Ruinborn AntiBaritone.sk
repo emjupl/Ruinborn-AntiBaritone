@@ -1,0 +1,85 @@
+on load:
+	{lastY::%player%} = 0
+	set {detectCount.%player%} to 0
+	
+on join:
+	set {detectCount.%player%} to 0
+	set {baritoneFlags.%player%} to 0
+
+on player move:
+	set {_y.%player%} to y-coordinate of player
+	set {_y.%player%} to round({_y.%player%})
+	
+	
+	set {lastY::%player%} to round({lastY::%player%})
+	if round({_y.%player%}) is round({lastY::%player%}):
+		set {_x.%player%} to x-coordinate of player
+		set {_decimalX.%player%} to {_x.%player%} - floor({_x.%player%})
+
+		set {_z.%player%} to z-coordinate of player
+		set {_decimalZ.%player%} to {_z.%player%} - floor({_z.%player%})
+
+		add 1 to {loop.%player%}
+
+		set {current.%player%} to location of player
+		
+		if block under player is not air:
+			if block above player is not water:
+				if {_decimalX.%player%} >= 0.49:
+					if {_decimalX.%player%} <= 0.51:
+					add 1 to {detectCount.%player%}
+					if {detectCount.%player%} >= 15:
+						set {detectCount.%player%} to 0
+						add 1 to {baritoneDetection.%player%}
+
+					if {baritoneDetection.%player%} >= 8:
+						add 1 to {baritoneFlags.%player%}
+						send "&8[&6&lRuinborn&8] &7Gracz %player% zostal oznaczony podejrzeniem o nielegalne oprogramowanie! %{baritoneFlags.%player%}%&7/&e35" to console
+
+				
+				if {_decimalZ.%player%} >= 0.49:
+					if {_decimalZ.%player%} <= 0.51:
+					add 1 to {detectCount.%player%}
+
+					if {detectCount.%player%} >= 15:
+						set {detectCount.%player%} to 0
+						add 1 to {baritoneDetection.%player%}
+
+					if {baritoneDetection.%player%} >= 7:
+						add 1 to {baritoneFlags.%player%}
+						send "&8[&6&lRuinborn&8] &7Gracz %player% zostal oznaczony podejrzeniem o nielegalne oprogramowanie! %{baritoneFlags.%player%}%&7/&e35" to console
+						
+				if {baritoneFlags.%player%} >= 10:
+					set {warning.%player%} to 1
+
+				if {loop.%player%} >= 130:
+					set {detectCount.%player%} to 0
+					set {baritoneDetection.%player%} to 0
+					set {loop.%player%} to 0
+					
+				if {baritoneFlags.%player%} >= 35:
+					
+					set {baritoneDetection.%player%} to 0
+					set {baritonebaritoneFlags.%player%} to 0
+					set {detectCount.%player%} to 0
+					kick player due to "&6&lRuinborn Anticheat&8%nl%%nl%&8-------------------- %nl%%nl%&e&lTwoje zachowanie wzbudzilo podejrzenia systemu przeciw naruszeniom regulaminu. %nl%%nl%&r&7Mozesz ponownie polaczyc sie z serwerem. %nl%%nl%&8--------------------"
+
+				
+	set {lastY::%player%} to {_y.%player%}
+	
+	
+on player move:
+	if {warning.%player%} = 1:
+		if {alreadyWarned.%player%} != 1:
+			if block under player is not air:
+				if block above player is not water:
+					set {alreadyWarned.%player%} to 1
+					cancel event
+					send title "&c&lZATRZYMAJ SIE!" with subtitle "&7Zostales oznaczony podejrzeniem o nielegalne oprogramowanie." to player
+					wait 2 seconds
+					set {warning.%player%} to 0
+					set {baritoneDetection.%player%} to 0
+					set {baritoneFlags.%player%} to 0
+					set {detectCount.%player%} to 0
+					set {alreadyWarned.%player%} to 0
+					send title "&6&lBezpiecznie!" with subtitle "&7Juz mozesz sie ruszyc. :)" to player
